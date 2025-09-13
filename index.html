@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Drive Direct Download Link Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Z6V4ZXXZXS"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Z6V4ZXXZXS');
+</script>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen p-4">
+    <div class="max-w-2xl mx-auto">
+        <!-- Language Switcher -->
+        <div class="flex justify-end mb-4 pt-4">
+            <div class="bg-white rounded-lg shadow-md p-1 flex">
+                <button id="langEn" class="px-3 py-1 rounded text-sm font-medium transition-colors duration-200 bg-blue-600 text-white">
+                    English
+                </button>
+                <button id="langZh" class="px-3 py-1 rounded text-sm font-medium transition-colors duration-200 text-gray-600 hover:text-gray-800">
+                    繁體中文
+                </button>
+            </div>
+        </div>
+
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-blue-600 rounded-full mb-4">
+                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
+                </svg>
+            </div>
+            <h1 id="mainTitle" class="text-3xl font-bold text-gray-800 mb-2">Google Drive Direct Download</h1>
+            <p id="mainSubtitle" class="text-gray-600">Convert sharing links to direct download links</p>
+        </div>
+
+        <!-- Main Card -->
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+            <!-- Checklist -->
+            <div class="mb-6">
+                <h2 id="checklistTitle" class="text-lg font-semibold text-gray-800 mb-3">Before you start, make sure:</h2>
+                <div class="space-y-2">
+                    <label class="flex items-center space-x-3 cursor-pointer">
+                        <input type="checkbox" id="publicCheck" class="w-5 h-5 text-blue-600 rounded focus:ring-blue-500">
+                        <span id="publicCheckText" class="text-gray-700">The file is publicly accessible (Anyone with the link can view)</span>
+                    </label>
+                    <label class="flex items-center space-x-3 cursor-pointer">
+                        <input type="checkbox" id="fileTypeCheck" class="w-5 h-5 text-blue-600 rounded focus:ring-blue-500">
+                        <span id="fileTypeCheckText" class="text-gray-700">The file is NOT a Google Workspace document (Docs, Sheets, Slides, etc.)</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Input Section -->
+            <div class="mb-6">
+                <label id="inputLabel" for="driveLink" class="block text-sm font-medium text-gray-700 mb-2">
+                    Paste your Google Drive sharing link:
+                </label>
+                <textarea 
+                    id="driveLink" 
+                    class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                    rows="3"
+                ></textarea>
+            </div>
+
+            <!-- Convert Button -->
+            <button 
+                id="convertBtn" 
+                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                disabled
+            >
+                Convert to Direct Download Link
+            </button>
+
+            <!-- Result Section -->
+            <div id="resultSection" class="mt-6 hidden">
+                <label id="resultLabel" class="block text-sm font-medium text-gray-700 mb-2">
+                    Your direct download link:
+                </label>
+                <div class="flex space-x-2">
+                    <textarea 
+                        id="resultLink" 
+                        readonly 
+                        class="flex-1 p-3 bg-gray-50 border border-gray-300 rounded-lg resize-none"
+                        rows="2"
+                    ></textarea>
+                    <button 
+                        id="copyBtn" 
+                        class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition duration-200 flex items-center justify-center"
+                        title="Copy to clipboard"
+                    >
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                        </svg>
+                    </button>
+                </div>
+                <div id="copySuccess" class="mt-2 text-green-600 text-sm hidden">
+                    ✓ Copied to clipboard!
+                </div>
+            </div>
+
+            <!-- Error Section -->
+            <div id="errorSection" class="mt-4 hidden">
+                <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                    <div class="flex items-center">
+                        <svg class="w-5 h-5 text-red-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <span id="errorMessage" class="text-red-700"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Info Card -->
+        <div class="bg-white rounded-xl shadow-lg p-6">
+            <h3 id="infoTitle" class="text-lg font-semibold text-gray-800 mb-3">How it works:</h3>
+            <div class="space-y-2 text-gray-600">
+                <p id="info1">• Extracts the file ID from your Google Drive sharing link</p>
+                <p id="info2">• Converts it to a direct download URL format</p>
+                <p id="info3">• Works only with files (not Google Docs, Sheets, or Slides)</p>
+                <p id="info4">• File must be set to "Anyone with the link can view"</p>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="text-center mt-8 pb-8">
+            <p class="text-gray-500 text-sm">
+                Created by <a href="https://www.aaronshi.cc" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:text-blue-700 underline">AaronShi.cc</a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Language translations
+        const translations = {
+            en: {
+                mainTitle: 'Google Drive Direct Download',
+                mainSubtitle: 'Convert sharing links to direct download links',
+                checklistTitle: 'Before you start, make sure:',
+                publicCheckText: 'The file is publicly accessible (Anyone with the link can view)',
+                fileTypeCheckText: 'The file is NOT a Google Workspace document (Docs, Sheets, Slides, etc.)',
+                inputLabel: 'Paste your Google Drive sharing link:',
+                inputPlaceholder: 'https://drive.google.com/file/d/1umFXPfadfaT7b6afTlkwZ/view or https://docs.google.com/document/d/1IHAKSdafsdfadsfaaYZwpn/edit',
+                convertBtn: 'Convert to Direct Download Link',
+                resultLabel: 'Your direct download link:',
+                copySuccess: '✓ Copied to clipboard!',
+                infoTitle: 'How it works:',
+                info1: '• Extracts the file ID from your Google Drive sharing link',
+                info2: '• Converts it to a direct download URL format',
+                info3: '• Works only with files (not Google Docs, Sheets, or Slides)',
+                info4: '• File must be set to "Anyone with the link can view"',
+                errorInvalidLink: 'Could not find file ID in the link. Please make sure you\'re using a valid Google Drive sharing link.',
+                copyBtnTitle: 'Copy to clipboard'
+            },
+            zh: {
+                mainTitle: 'Google Drive 直接下載',
+                mainSubtitle: '將分享連結轉換為直接下載連結',
+                checklistTitle: '開始之前，請確認：',
+                publicCheckText: '檔案已設為公開存取（任何人只要有連結就能檢視）',
+                fileTypeCheckText: '檔案不是 Google Workspace 文件（如 Google 文件、試算表、簡報等）',
+                inputLabel: '貼上您的 Google Drive 分享連結：',
+                inputPlaceholder: 'https://drive.google.com/file/d/1umFXPfLrr3WlRJwh-L5yGT7b6afTlkwZ/view 或 https://docs.google.com/document/d/1IHAKSK9js6GsHTeqoIX5bGA1DFaYZwpn/edit',
+                convertBtn: '轉換為直接下載連結',
+                resultLabel: '您的直接下載連結：',
+                copySuccess: '✓ 已複製到剪貼簿！',
+                infoTitle: '運作原理：',
+                info1: '• 從您的 Google Drive 分享連結中提取檔案 ID',
+                info2: '• 將其轉換為直接下載 URL 格式',
+                info3: '• 僅適用於檔案（不適用於 Google 文件、試算表或簡報）',
+                info4: '• 檔案必須設定為「任何人只要有連結就能檢視」',
+                errorInvalidLink: '無法在連結中找到檔案 ID。請確認您使用的是有效的 Google Drive 分享連結。',
+                copyBtnTitle: '複製到剪貼簿'
+            }
+        };
+
+        // Language management
+        let currentLang = 'en';
+        
+        // Detect browser language
+        function detectBrowserLanguage() {
+            const browserLang = navigator.language || navigator.userLanguage;
+            if (browserLang.startsWith('zh')) {
+                return 'zh';
+            }
+            return 'en';
+        }
+
+        // Update UI language
+        function updateLanguage(lang) {
+            currentLang = lang;
+            const t = translations[lang];
+            
+            // Update all text elements
+            document.getElementById('mainTitle').textContent = t.mainTitle;
+            document.getElementById('mainSubtitle').textContent = t.mainSubtitle;
+            document.getElementById('checklistTitle').textContent = t.checklistTitle;
+            document.getElementById('publicCheckText').textContent = t.publicCheckText;
+            document.getElementById('fileTypeCheckText').textContent = t.fileTypeCheckText;
+            document.getElementById('inputLabel').textContent = t.inputLabel;
+            document.getElementById('driveLink').placeholder = t.inputPlaceholder;
+            document.getElementById('convertBtn').textContent = t.convertBtn;
+            document.getElementById('resultLabel').textContent = t.resultLabel;
+            document.getElementById('copySuccess').textContent = t.copySuccess;
+            document.getElementById('infoTitle').textContent = t.infoTitle;
+            document.getElementById('info1').textContent = t.info1;
+            document.getElementById('info2').textContent = t.info2;
+            document.getElementById('info3').textContent = t.info3;
+            document.getElementById('info4').textContent = t.info4;
+            document.getElementById('copyBtn').title = t.copyBtnTitle;
+            
+            // Update language buttons
+            document.getElementById('langEn').className = lang === 'en' 
+                ? 'px-3 py-1 rounded text-sm font-medium transition-colors duration-200 bg-blue-600 text-white'
+                : 'px-3 py-1 rounded text-sm font-medium transition-colors duration-200 text-gray-600 hover:text-gray-800';
+            document.getElementById('langZh').className = lang === 'zh' 
+                ? 'px-3 py-1 rounded text-sm font-medium transition-colors duration-200 bg-blue-600 text-white'
+                : 'px-3 py-1 rounded text-sm font-medium transition-colors duration-200 text-gray-600 hover:text-gray-800';
+        }
+
+        // Initialize language
+        document.addEventListener('DOMContentLoaded', function() {
+            const initialLang = detectBrowserLanguage();
+            updateLanguage(initialLang);
+        });
+
+        // Language switcher event listeners
+        document.getElementById('langEn').addEventListener('click', () => updateLanguage('en'));
+        document.getElementById('langZh').addEventListener('click', () => updateLanguage('zh'));
+
+        const publicCheck = document.getElementById('publicCheck');
+        const fileTypeCheck = document.getElementById('fileTypeCheck');
+        const driveLink = document.getElementById('driveLink');
+        const convertBtn = document.getElementById('convertBtn');
+        const resultSection = document.getElementById('resultSection');
+        const resultLink = document.getElementById('resultLink');
+        const copyBtn = document.getElementById('copyBtn');
+        const copySuccess = document.getElementById('copySuccess');
+        const errorSection = document.getElementById('errorSection');
+        const errorMessage = document.getElementById('errorMessage');
+
+        // Enable/disable convert button based on checklist
+        function updateConvertButton() {
+            const bothChecked = publicCheck.checked && fileTypeCheck.checked;
+            const hasLink = driveLink.value.trim().length > 0;
+            convertBtn.disabled = !(bothChecked && hasLink);
+        }
+
+        publicCheck.addEventListener('change', updateConvertButton);
+        fileTypeCheck.addEventListener('change', updateConvertButton);
+        driveLink.addEventListener('input', updateConvertButton);
+
+        // Convert link function
+        convertBtn.addEventListener('click', function() {
+            const link = driveLink.value.trim();
+            
+            // Hide previous results/errors
+            resultSection.classList.add('hidden');
+            errorSection.classList.add('hidden');
+            copySuccess.classList.add('hidden');
+
+            // Extract file ID using regex - handles multiple URL formats
+            const regex = /\/d\/([a-zA-Z0-9_-]+)/;
+            const match = link.match(regex);
+
+            if (!match) {
+                showError(translations[currentLang].errorInvalidLink);
+                return;
+            }
+
+            const fileId = match[1];
+            const directLink = `https://drive.google.com/uc?export=download&id=${fileId}`;
+
+            // Show result
+            resultLink.value = directLink;
+            resultSection.classList.remove('hidden');
+        });
+
+        // Copy to clipboard function
+        copyBtn.addEventListener('click', async function() {
+            try {
+                await navigator.clipboard.writeText(resultLink.value);
+                copySuccess.classList.remove('hidden');
+                setTimeout(() => {
+                    copySuccess.classList.add('hidden');
+                }, 3000);
+            } catch (err) {
+                // Fallback for older browsers
+                resultLink.select();
+                document.execCommand('copy');
+                copySuccess.classList.remove('hidden');
+                setTimeout(() => {
+                    copySuccess.classList.add('hidden');
+                }, 3000);
+            }
+        });
+
+        // Show error function
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorSection.classList.remove('hidden');
+        }
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97e95b2990d04a46',t:'MTc1Nzc4NDQ1NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
